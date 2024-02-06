@@ -20,13 +20,13 @@ This repository contains the codebase for the Distributed Software Architecture 
 
 
 ## Usage
-Run the microservices at your private network or at your prefered cloud provider.
+Run the microservices on your private network or at your preferred cloud provider.
 
-Migrate and seed the Schema located at api-rest/migration/000001_create_ddl.up.sql at your prefered private/public cloud database.
+Migrate and seed the Schema located at api-rest/migration/000001_create_ddl.up.sql at your preferred private/public cloud database.
 
-Kubernetes assets can be found at the config folder.
+Kubernetes assets can be found in the config folder.
 
-Load tester tool and scripts can be found at load-test folder.
+Load tester tool and scripts can be found in the load-test folder.
 
 
 ## Contribution
@@ -41,6 +41,3 @@ MIT License
 
 ## Acknowledgments
 This research and development effort were made possible by the contributions of Gustavo Freire, Herminio Paucar e Julio Cezar Estrella and the support of the Laboratory of Distributed Systems and Concurrent Programming (LaSDPC) at São Paulo University.
-
-## Contact
-For any inquiries or feedback regarding the DSA codebase, please contact [maintainer's email address].
