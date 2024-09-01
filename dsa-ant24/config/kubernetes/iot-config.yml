@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    io.iot.service: iot-env
+  name: iot-env
+data:
+  ENVIRONMENT: PROD
+  GIN_PORT: '8080'
+  POSTGRES_HOST: usp.ctodvxq4rhhd.sa-east-1.rds.amazonaws.com
+  POSTGRES_PORT: '5432'
+  POSTGRES_USER: usp
+  POSTGRES_PASSWORD: adminadminusp
+  POSTGRES_DATABASE: iot
+  REDIS_ADDRESS: redis:6379
