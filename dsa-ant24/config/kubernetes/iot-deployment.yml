@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    io.iot.service: iot-app
+  name: iot-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.iot.service: iot-app
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        io.iot.network/app-network: "true"
+        io.iot.service: iot-app
+    spec:
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: gin-app
+          image: registry.gitlab.com/iot-global/backend/iot:v1
+          ports:
+            - containerPort: 6000
+          resources: {}
+          imagePullPolicy: "Always"
+          envFrom:
+            - configMapRef:
+                name: iot-env
+
+      restartPolicy: Always
+status: {}
