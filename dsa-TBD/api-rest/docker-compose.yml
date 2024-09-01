@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  # api:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "8080:8080"
+  #   environment:
+  #     - DATABASE_URL=postgresql://usp:adminadminusp@db:5432/iot
+  #   depends_on:
+  #     - db
+
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: usp
+      POSTGRES_PASSWORD: adminadminusp
+      POSTGRES_DB: iot
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
