@@ -1,3 +1,13 @@
+# Instructions:
+# 1. Build the Docker image:
+#    docker build -t dsa-api-container:latest .
+#
+# 2. Run the Docker container:
+#    docker run -d -p 8080:8080 --name dsa-api dsa-api-container:latest
+#    (Ensure the service inside the Go application listens on port 8080)
+#
+
+
 # Smart Building Distributed Software Architecture (DSA)
 
 ## Overview
