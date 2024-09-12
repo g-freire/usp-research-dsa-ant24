@@ -1,3 +1,4 @@
+# k apply -f deployment.yml -n usp-dev
 # Docker Registry Secret
 apiVersion: v1
 kind: Secret
@@ -152,7 +153,7 @@ spec:
           # image: uspresearchdsaant24:latest  # Local image
           # imagePullPolicy: Never  # Instruct Kubernetes to use the local image
           ports:
-            - containerPort: 6000
+            - containerPort: 8080
           envFrom:
             - configMapRef:
                 name: iot-env  # Non-sensitive environment variables

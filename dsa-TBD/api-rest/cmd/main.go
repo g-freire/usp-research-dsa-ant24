@@ -78,8 +78,8 @@ func main() {
 
 func handleVersion(c *gin.Context) {
 	iot := []string{
-		"iot/create_table",
-		"iot/create?n=500",
+		"/iot/create_table",
+		"/iot/create?n=500",
 		"/iot",
 	}
 	res := map[string]interface{}{
