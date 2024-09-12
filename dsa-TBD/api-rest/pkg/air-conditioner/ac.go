@@ -7,8 +7,14 @@ import (
 )
 
 type ACRepository interface {
+	// Get all records with pagination support
 	GetAll(ctx context.Context, limit, offset string) ([]AirConditionerSensorRead, error)
+
+	// Save multiple air conditioner sensor records
 	SaveMany(ctx context.Context, acColl []AirConditionerSensorWrite) (count int64, err error)
+
+	// Create the ac_sensor table if it does not exist
+	CreateTable(ctx context.Context) error
 }
 
 type AirConditionerSensorRead struct {

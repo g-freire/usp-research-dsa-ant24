@@ -3,11 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/gin-contrib/cors"
-	"github.com/gin-contrib/gzip"
-	"github.com/gin-gonic/gin"
-	_ "github.com/golang-migrate/migrate/v4/database/postgres"
-	"gopkg.in/go-playground/validator.v9"
 	"log"
 	"net/http"
 	"os"
@@ -17,7 +12,13 @@ import (
 	"uty-api/internal/common/constant"
 	"uty-api/internal/config"
 	pg "uty-api/internal/db"
-	"uty-api/pkg/air-conditioner"
+	air_conditioner "uty-api/pkg/air-conditioner"
+
+	"github.com/gin-contrib/cors"
+	"github.com/gin-contrib/gzip"
+	"github.com/gin-gonic/gin"
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
+	"gopkg.in/go-playground/validator.v9"
 )
 
 func main() {
@@ -77,10 +78,12 @@ func main() {
 
 func handleVersion(c *gin.Context) {
 	iot := []string{
+		"iot/create_table",
+		"iot/create?n=500",
 		"/iot",
-		"iot/create?n=500"}
+	}
 	res := map[string]interface{}{
-		"version":   "USP IoT API v1 - 2022-12-20",
+		"version":   "USP IoT API v1 - 2024-08-12",
 		"time":      time.Now().UTC().String(),
 		"endpoints": iot,
 	}

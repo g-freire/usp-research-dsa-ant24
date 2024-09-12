@@ -43,4 +43,5 @@ tasks.xml files.
 backlog
 k6/
 
-uty-api
+
+deploy_to_registry.sh

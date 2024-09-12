@@ -3,13 +3,14 @@ package air_conditioner
 import (
 	"context"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"gopkg.in/go-playground/validator.v9"
 	"net/http"
 	"strconv"
 	"time"
 	"uty-api/internal/common/constant"
 	errors "uty-api/internal/common/error"
+
+	"github.com/gin-gonic/gin"
+	"gopkg.in/go-playground/validator.v9"
 )
 
 type Handler struct {
@@ -25,15 +26,35 @@ func NewHandler(r *gin.Engine, route string, val *validator.Validate, acRepo ACR
 	v1 := r.Group(route)
 	{
 		v1.GET("/", handler.GetAll)
-		//v1.POST("/", handler.SaveMany)
-		v1.GET("/create", handler.SaveMany) // eg. localhost:8080/iot/create?n=500
+		v1.GET("/create_table", handler.CreateTable) // Route to create the table
+		v1.GET("/create", handler.SaveMany)          // eg. localhost:8080/iot/create?n=500
 	}
 }
 
+// Handler for creating the database table
+func (h *Handler) CreateTable(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c.Request.Context(), constant.CTX_DEFAULT*time.Second)
+	defer cancel()
+
+	// Call the repository function to create the table
+	err := h.ACRepository.CreateTable(ctx)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, errors.Response{
+			Status:  http.StatusInternalServerError,
+			Type:    constant.ErrDatabaseOperation,
+			Message: []string{"Error creating the table", err.Error()},
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"Status":  http.StatusOK,
+		"Message": "Table created successfully or already exists",
+	})
+}
+
 func (h *Handler) GetAll(c *gin.Context) {
-	// ctx, cancel := context.WithTimeout(c.Request.Context(), constant.CTX_DEFAULT*time.Second)
-	// defer cancel()
-	ctx:= context.Background()
+	ctx := context.Background()
 
 	limit := c.Query("limit")
 	offset := c.Query("offset")
@@ -53,7 +74,6 @@ func (h *Handler) SaveMany(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), constant.CTX_DEFAULT*time.Second)
 	defer cancel()
 
-	// random generator
 	amount := c.Query("n")
 	if amount == "" {
 		amount = "100"
@@ -61,34 +81,15 @@ func (h *Handler) SaveMany(c *gin.Context) {
 	amountInt, _ := strconv.Atoi(amount)
 	acColl := createRandomACSensorCollection(amountInt)
 
-	// uncomment for the rest api post
-	//var acColl []AirConditionerSensorWrite
-	//if err := c.BindJSON(&acColl); err != nil {
-	//	c.JSON(http.StatusBadRequest, errors.Response{
-	//		Status:  http.StatusBadRequest,
-	//		Type:    constant.ErrRequestDecoding,
-	//		Message: []string{err.Error()}})
-	//	return
-	//}
-	//// validation of all structs before hitting the db
-	//for i, ac := range acColl {
-	//	if err := h.Validate.Struct(ac); err != nil {
-	//		c.JSON(http.StatusBadRequest, errors.Response{
-	//			Status:  http.StatusBadRequest,
-	//			Type:    constant.ErrRequestBody,
-	//			Message: []string{err.Error(), fmt.Sprintf("Check Air Conditioner at index %d", i+1)}})
-	//		return
-	//	}
-	//}
-
 	count, err := h.ACRepository.SaveMany(ctx, acColl)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, errors.Response{
 			Status:  http.StatusBadRequest,
 			Type:    constant.ErrDatabaseOperation,
 			Message: []string{err.Error()}})
+		return
 	}
-	msg := fmt.Sprintf("Created %v Air Conditioner successfully", count)
+	msg := fmt.Sprintf("Created %v Air Conditioner records successfully", count)
 	c.JSON(http.StatusCreated, gin.H{
 		"Status":  http.StatusCreated,
 		"Message": msg,

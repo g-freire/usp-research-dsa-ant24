@@ -3,22 +3,51 @@ package air_conditioner
 import (
 	"context"
 	"fmt"
+	"log"
+	"strings"
+
 	"github.com/georgysavva/scany/pgxscan"
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
-	"log"
-	"strings"
 )
 
 type postgres struct {
 	db *pgxpool.Pool
-	//ch cache.Cache
 }
 
 func NewRepository(db *pgxpool.Pool) *postgres {
 	return &postgres{
 		db: db,
 	}
+}
+
+// CreateTable creates the ac_sensor table if it doesn't exist
+func (p postgres) CreateTable(ctx context.Context) error {
+	q := `
+	CREATE TABLE IF NOT EXISTS ac_sensor(
+		id SERIAL NOT NULL PRIMARY KEY,
+		temperature_current FLOAT NOT NULL,
+		temperature_desired FLOAT NOT NULL,
+		humidity FLOAT NOT NULL,
+		pressure FLOAT NOT NULL,
+		air_quality FLOAT NOT NULL,
+		voltage FLOAT NOT NULL,
+		current FLOAT NOT NULL,
+		power FLOAT NOT NULL,
+		is_on BOOLEAN NOT NULL,
+		status VARCHAR(120) NOT NULL,
+		location VARCHAR(120) NOT NULL,
+		extracted_at TIMESTAMP NOT NULL DEFAULT NOW(),
+		CONSTRAINT status_check CHECK (status in ('actuating', 'ventilator', 'heater', 'cooling', 'off'))
+	);`
+
+	_, err := p.db.Exec(ctx, q)
+	if err != nil {
+		log.Printf("[ERROR]: Could not create table ac_sensor: %v", err)
+		return err
+	}
+	log.Println("[INFO]: Table ac_sensor created or already exists.")
+	return nil
 }
 
 func (p postgres) GetAll(ctx context.Context, limit, offset string) ([]AirConditionerSensorRead, error) {
@@ -83,6 +112,5 @@ func (p postgres) SaveMany(ctx context.Context, acColl []AirConditionerSensorWri
 	if err != nil {
 		log.Println(err)
 	}
-	//fmt.Println(copyCount)
 	return copyCount, nil
 }
