@@ -1,0 +1,36 @@
+# 1) Taint the node (so that only bursty workloads can be scheduled there)
+# kubectl taint nodes <node-name> bursty-workload=true:NoSchedule 
+# 2) Apply the bursty workload deployment
+# kubectl apply -f poisson-bursty-app.yaml
+# 3) Check pod placement:
+# kubectl get pods -o wide  # Verify where the pods are running
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: poisson-bursty-app  # Name of the deployment
+spec:
+  replicas: 3  # Create 3 replicas (pods)
+  selector:
+    matchLabels:
+      app: poisson-bursty-app  # Label to identify pods managed by this deployment
+  template:
+    metadata:
+      labels:
+        app: poisson-bursty-app  # Pod label used to match with toleration
+    spec:
+      tolerations:
+        - key: "bursty-workload"  # Tolerate nodes tainted with this key
+          operator: "Equal"
+          value: "true"  # Tolerate only nodes with this value
+          effect: "NoSchedule"  # Pods can only be scheduled on nodes with this taint
+      containers:
+        - name: bursty-container
+          image: nginx  # Simple Nginx container for bursty workloads
+          resources:
+            requests:
+              cpu: "500m"  # Request 500m of CPU (0.5 cores)
+              memory: "1Gi"  # Request 1Gi of memory
+            limits:
+              cpu: "1"  # Maximum CPU usage set to 1 core
+              memory: "2Gi"  # Maximum memory usage set to 2Gi

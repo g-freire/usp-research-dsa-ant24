@@ -1,0 +1,37 @@
+# Apply the deployment with anti-affinity
+# kubectl apply -f uniform-workload.yaml  
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uniform-workload   # Name of the deployment
+spec:
+  replicas: 5  # Deploy 5 replicas (pods)
+  selector:
+    matchLabels:
+      app: uniform-workload  # Label to identify pods managed by this deployment
+  template:
+    metadata:
+      labels:
+        app: uniform-workload  # Pod label used for anti-affinity rules
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - uniform-workload  # Ensure pods with this label are spread across nodes
+              topologyKey: "kubernetes.io/hostname"  # Spread pods across different nodes
+      containers:
+        - name: app-container
+          image: nginx  # Simple Nginx container
+          resources:
+            requests:
+              cpu: "100m"  # Request 100m of CPU (0.1 cores)
+              memory: "256Mi"  # Request 256Mi of memory
+            limits:
+              cpu: "200m"  # Set maximum CPU usage to 200m (0.2 cores)
+              memory: "512Mi"  # Set maximum memory usage to 512Mi

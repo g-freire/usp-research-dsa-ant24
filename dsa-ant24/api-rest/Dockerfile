@@ -22,6 +22,3 @@ FROM alpine
 ENV APP_HOME /uty-api
 COPY --from=builder ${APP_HOME}/ ./
 CMD ["./uty-api"]
-
-
-# MountVolume.SetUp failed for volume "kube-api-access-vt6sv" : failed to sync configmap cache: timed out waiting for the condition
