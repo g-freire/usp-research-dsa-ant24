@@ -38,7 +38,7 @@ metadata:
   labels:
     io.iot.service: iot-app
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       io.iot.service: iot-app
@@ -96,10 +96,34 @@ metadata:
   labels:
     io.iot.service: iot-app
 spec:
-  type: LoadBalancer
+  # type: LoadBalancer
   ports:
     - name: "iot-app-service"
       port: 8080
       targetPort: 8080
   selector:
     io.iot.service: iot-app
+
+---
+# IoT Application Ingress
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: iot-app-ingress
+  namespace: usp-dev
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /  # Ensures paths are forwarded correctly
+    nginx.ingress.kubernetes.io/load-balance: "round_robin"  # Load balancing
+spec:
+  ingressClassName: nginx  # Specify the NGINX Ingress Class
+  rules:
+    - host: iot-api.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: iot-app
+                port:
+                  number: 8080
