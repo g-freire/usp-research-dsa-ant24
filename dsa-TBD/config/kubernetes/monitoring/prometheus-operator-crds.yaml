@@ -1,0 +1,16 @@
+# https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-operator-crds
+#
+# Essa chart instala todos os CRDs (recursos customizados) do Prometheus Operator, usados para monitorirar 
+# as aplicações rodando no Kubernetes 
+#
+# Deve ser instalada antes da chart `kube-prometheus-stack` e de outras charts que usem os CRDs
+
+repositories:
+- name: prometheus-community
+  url: https://prometheus-community.github.io/helm-charts
+
+releases:
+- name: prometheus-operator-crds
+  namespace: monitoring
+  chart: prometheus-community/prometheus-operator-crds
+  version: 6.0.0

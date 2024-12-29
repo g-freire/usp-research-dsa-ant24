@@ -1,0 +1,437 @@
+# https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack
+#
+# Essa chart instala Prometheus e Alertmanager como CRDs do Prometheus Operator
+#
+# Também instala outros componentes que coletam métricas do Kubernetes:
+# 
+# - prometheus-node-exporter: coleta métricas de SO e Hardware dos nodes do cluster
+# - kube-state-metrics: coleta métricas de recursos da API do Kubernetes, como número de pods, deployments, etc
+#
+# Também pode instalar o Grafana, porém optei por separá-lo em outra Chart, para não misturar o ciclo de vida das aplicações.
+# Iremos instalar apenas as dashboards do Grafana desta chart
+
+repositories:
+- name: prometheus-community
+  url: https://prometheus-community.github.io/helm-charts
+
+releases:
+- name: kube-prometheus-stack
+  namespace: monitoring
+  chart: prometheus-community/kube-prometheus-stack
+  version: 51.2.0
+  values:
+  # https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-prometheus-stack/values.yaml
+  - crds:
+      enabled: false # CRDs já são instalado pela chart prometheus-operator-crds
+
+    # possibilidade para desabilitar regras de alertas que já vem pré instaladas
+    defaultRules:
+      create: true
+      rules:
+        alertmanager: true
+        etcd: true
+        configReloaders: true
+        general: true
+        k8s: true
+        kubeApiserverAvailability: true
+        kubeApiserverBurnrate: true
+        kubeApiserverHistogram: true
+        kubeApiserverSlos: true
+        kubeControllerManager: true
+        kubelet: true
+        kubeProxy: true
+        kubePrometheusGeneral: true
+        kubePrometheusNodeRecording: true
+        kubernetesApps: true
+        kubernetesResources: true
+        kubernetesStorage: true
+        kubernetesSystem: true
+        kubeSchedulerAlerting: true
+        kubeSchedulerRecording: true
+        kubeStateMetrics: true
+        network: true
+        node: true
+        nodeExporterAlerting: true
+        nodeExporterRecording: true
+        prometheus: true
+        prometheusOperator: true
+        windows: true
+
+    # Configurações do Alertmanager
+    # https://prometheus.io/docs/alerting/alertmanager/
+    alertmanager:
+      enabled: true
+
+      ## Alertmanager configuration directives
+      ## ref: https://prometheus.io/docs/alerting/configuration/#configuration-file
+      ##      https://prometheus.io/webtools/alerting/routing-tree-editor/
+      config:
+        global:
+          resolve_timeout: 5m
+        inhibit_rules:
+          - source_matchers:
+              - 'severity = critical'
+            target_matchers:
+              - 'severity =~ warning|info'
+            equal:
+              - 'namespace'
+              - 'alertname'
+          - source_matchers:
+              - 'severity = warning'
+            target_matchers:
+              - 'severity = info'
+            equal:
+              - 'namespace'
+              - 'alertname'
+          - source_matchers:
+              - 'alertname = InfoInhibitor'
+            target_matchers:
+              - 'severity = info'
+            equal:
+              - 'namespace'
+        route:
+          group_by: ['namespace']
+          group_wait: 30s
+          group_interval: 5m
+          repeat_interval: 12h
+          receiver: 'null'
+          routes:
+          - receiver: 'null'
+            matchers:
+              - alertname =~ "InfoInhibitor|Watchdog"
+        receivers:
+        - name: 'null'
+        templates:
+        - '/etc/alertmanager/config/*.tmpl'
+
+      ## Alertmanager template files to format alerts
+      ## By default, templateFiles are placed in /etc/alertmanager/config/ and if
+      ## they have a .tmpl file suffix will be loaded. See config.templates above
+      ## to change, add other suffixes. If adding other suffixes, be sure to update
+      ## config.templates above to include those suffixes.
+      ## ref: https://prometheus.io/docs/alerting/notifications/
+      ##      https://prometheus.io/docs/alerting/notification_examples/
+      ##
+      templateFiles: {}
+
+      ingress:
+        enabled: false
+
+      service:
+        clusterIP: ""
+        port: 9093
+        targetPort: 9093
+        nodePort: 30903
+        externalTrafficPolicy: Cluster
+        type: ClusterIP
+
+      serviceMonitor:
+        interval: ""
+        selfMonitor: true
+
+        ## MetricRelabelConfigs to apply to samples after scraping, but before ingestion.
+        ## ref: https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#relabelconfig
+        ##
+        metricRelabelings: []
+        # - action: keep
+        #   regex: 'kube_(daemonset|deployment|pod|namespace|node|statefulset).+'
+        #   sourceLabels: [__name__]
+
+        ## RelabelConfigs to apply to samples before scraping
+        ## ref: https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#relabelconfig
+        ##
+        relabelings: []
+        # - sourceLabels: [__meta_kubernetes_pod_node_name]
+        #   separator: ;
+        #   regex: ^(.*)$
+        #   targetLabel: nodename
+        #   replacement: $1
+        #   action: replace
+
+      ## Settings affecting alertmanagerSpec
+      ## ref: https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#alertmanagerspec
+      ##
+      alertmanagerSpec:
+        ## Image of Alertmanager
+        ##
+        image:
+          registry: quay.io
+          repository: prometheus/alertmanager
+          tag: v0.26.0
+
+        # Use logfmt (default) or json logging
+        logFormat: logfmt
+        logLevel: info
+        replicas: 1
+
+        ## Time duration Alertmanager shall retain data for. Default is '120h', and must match the regular expression
+        # [0-9]+(ms|s|m|h)
+        retention: 120h
+
+        resources:
+          requests:
+            cpu: "250m"
+            memory: "2Gi"
+
+        ## The default value "soft" means that the scheduler should *prefer* to not schedule two replica pods onto the same node but no guarantee is provided.
+        ## The value "hard" means that the scheduler is *required* to not schedule two replica pods onto the same node.
+        ## The value "" will disable pod anti-affinity so that no anti-affinity rules will be configured.
+        podAntiAffinity: "soft"
+        podAntiAffinityTopologyKey: kubernetes.io/hostname
+
+    # Desabilitando o Grafana desta Chart
+    grafana:
+      enabled: false
+      # instalando dashboards como ConfigMaps, mesmo que o Grafana não seja instalado por aqui
+      forceDeployDashboards: true
+
+    # Configurações do NodeExporter
+    nodeExporter:
+      enabled: true
+      operatingSystems:
+        linux:
+          enabled: true
+        darwin:
+          enabled: false
+
+    # Configurações do Prometheus
+    prometheus:
+      enabled: true
+
+      service:
+        port: 9090
+        targetPort: 9090
+        type: ClusterIP
+
+      ingress:
+        enabled: false
+
+      # https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#prometheusspec
+      prometheusSpec:
+
+        # Habilitando o Prometheus a olhar para todos os recursos de Prometheus do Cluster, não só os instalados pela Chart
+        # https://stackoverflow.com/questions/60706343/prometheus-operator-enable-monitoring-for-everything-in-all-namespaces
+        ruleSelectorNilUsesHelmValues: false
+        serviceMonitorSelectorNilUsesHelmValues: false
+        podMonitorSelectorNilUsesHelmValues: false
+        probeSelectorNilUsesHelmValues: false
+        scrapeConfigSelectorNilUsesHelmValues: false
+
+        # defaul = 30s
+        scrapeInterval: ""
+
+        image:
+          registry: quay.io
+          repository: prometheus/prometheus
+          tag: v2.47.0
+  
+        # Tempo de retenção das métricas. ajustar de acordo com o tamanho do armazenamento e quantidade de métricas
+        retention: 10d
+        
+        # Prometheus não escala bem horizontamente, portanto é mais recomendado usar apenas uma réplica e escalar verticalmente se for necessário
+        replicas: 1
+       
+        logLevel: debug
+        logFormat: logfmt # logfmt / json
+
+        resources:
+          requests:
+            cpu: "1000m"
+            memory: "4Gi"
+
+
+    # Resolvendo problema de métricas do cAdvisor com Docker como Container Runtime após k8s v.124
+    # Mais detalhes: https://github.com/rancher/rancher/issues/38934#issuecomment-1294585708
+    #
+    kubelet:
+      enabled: true
+      serviceMonitor:
+        cAdvisor: false
+
+    # Ver acima
+    extraManifests:
+      - apiVersion: v1
+        kind: ServiceAccount
+        metadata:
+          labels:
+            app: cadvisor
+          name: cadvisor
+          namespace: kube-system
+
+      - apiVersion: rbac.authorization.k8s.io/v1
+        kind: ClusterRole
+        metadata:
+          labels:
+            app: cadvisor
+          name: cadvisor
+        rules:
+        - apiGroups:
+          - policy
+          resourceNames:
+          - cadvisor
+          resources:
+          - podsecuritypolicies
+          verbs:
+          - use
+
+      - apiVersion: rbac.authorization.k8s.io/v1
+        kind: ClusterRoleBinding
+        metadata:
+          labels:
+            app: cadvisor
+          name: cadvisor
+        roleRef:
+          apiGroup: rbac.authorization.k8s.io
+          kind: ClusterRole
+          name: cadvisor
+        subjects:
+        - kind: ServiceAccount
+          name: cadvisor
+          namespace: kube-system
+
+      - apiVersion: apps/v1
+        kind: DaemonSet
+        metadata:
+          annotations:
+            seccomp.security.alpha.kubernetes.io/pod: docker/default
+          labels:
+            app: cadvisor
+          name: cadvisor
+          namespace: kube-system
+        spec:
+          selector:
+            matchLabels:
+              app: cadvisor
+              name: cadvisor
+          template:
+            metadata:
+              annotations:
+                scheduler.alpha.kubernetes.io/critical-pod: ""
+              labels:
+                app: cadvisor
+                name: cadvisor
+            spec:
+              automountServiceAccountToken: false
+              containers:
+              - args:
+                - --housekeeping_interval=10s
+                - --max_housekeeping_interval=15s
+                - --event_storage_event_limit=default=0
+                - --event_storage_age_limit=default=0
+                - --enable_metrics=app,cpu,disk,diskIO,memory,network,process
+                - --docker_only
+                - --store_container_labels=false
+                - --whitelisted_container_labels=io.kubernetes.container.name,io.kubernetes.pod.name,io.kubernetes.pod.namespace
+                image: gcr.io/cadvisor/cadvisor:v0.45.0
+                name: cadvisor
+                ports:
+                - containerPort: 8080
+                  name: http
+                  protocol: TCP
+                resources: {}
+                  # requests:
+                  #   cpu: 400m
+                  #   memory: 400Mi
+                volumeMounts:
+                - mountPath: /rootfs
+                  name: rootfs
+                  readOnly: true
+                - mountPath: /var/run
+                  name: var-run
+                  readOnly: true
+                - mountPath: /sys
+                  name: sys
+                  readOnly: true
+                - mountPath: /var/lib/docker
+                  name: docker
+                  readOnly: true
+                - mountPath: /dev/disk
+                  name: disk
+                  readOnly: true
+              priorityClassName: system-node-critical
+              serviceAccountName: cadvisor
+              terminationGracePeriodSeconds: 30
+              tolerations:
+              - key: node-role.kubernetes.io/controlplane
+                value: "true"
+                effect: NoSchedule
+              - key: node-role.kubernetes.io/etcd
+                value: "true"
+                effect: NoExecute
+              volumes:
+              - hostPath:
+                  path: /
+                name: rootfs
+              - hostPath:
+                  path: /var/run
+                name: var-run
+              - hostPath:
+                  path: /sys
+                name: sys
+              - hostPath:
+                  path: /var/lib/docker
+                name: docker
+              - hostPath:
+                  path: /dev/disk
+                name: disk
+
+      - apiVersion: v1
+        kind: Service
+        metadata:
+          name: cadvisor
+          labels:
+            app: cadvisor
+          namespace: kube-system
+        spec:
+          selector:
+            app: cadvisor
+          ports:
+          - name: cadvisor
+            port: 8080
+            protocol: TCP
+            targetPort: 8080
+
+      - apiVersion: monitoring.coreos.com/v1
+        kind: ServiceMonitor
+        metadata:
+          labels:
+            app: cadvisor
+          name: cadvisor
+          namespace: kube-system
+        spec:
+          endpoints:
+          - metricRelabelings:
+            - sourceLabels:
+              - container_label_io_kubernetes_pod_name
+              targetLabel: pod
+            - sourceLabels:
+              - container_label_io_kubernetes_container_name
+              targetLabel: container
+            - sourceLabels:
+              - container_label_io_kubernetes_pod_namespace
+              targetLabel: namespace
+            - action: labeldrop
+              regex: container_label_io_kubernetes_pod_name
+            - action: labeldrop
+              regex: container_label_io_kubernetes_container_name
+            - action: labeldrop
+              regex: container_label_io_kubernetes_pod_namespace
+            port: cadvisor
+            relabelings:
+            - sourceLabels:
+              - __meta_kubernetes_pod_node_name
+              targetLabel: node
+            - sourceLabels:
+              - __metrics_path__
+              targetLabel: metrics_path
+              replacement: /metrics/cadvisor
+            - sourceLabels:
+              - job
+              targetLabel: job
+              replacement: kubelet
+          namespaceSelector:
+            matchNames:
+            - kube-system
+          selector:
+            matchLabels:
+              app: cadvisor
