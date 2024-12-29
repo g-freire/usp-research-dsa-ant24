@@ -1,0 +1,22 @@
+controller:
+  config:
+    client-max-body-size: 500m
+    proxy-read-timeout: 300  # Set to 300 seconds (5 minutes)
+    proxy-send-timeout: 300  # Set to 300 seconds (5 minutes)
+    proxy-body-size: 500m
+
+  service:
+    annotations:
+    nginx.ingress.kubernetes.io/load-balance: "round_robin" # Default algorithm
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "30s"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "30s"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "30s"
+    #nginx.ingress.kubernetes.io/least-conn: "true"
+    nginx.ingress.kubernetes.io/affinity: "none"
+
+  metrics:
+    enabled: true
+    service:
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "10254"
