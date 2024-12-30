@@ -1,0 +1,73 @@
+# -------------------------------------
+# Helm values for NGINX Ingress
+# https://github.com/kubernetes/ingress-nginx/blob/main/charts/ingress-nginx/values.yaml
+# -------------------------------------
+
+global:
+  image:
+    registry: registry.k8s.io
+
+controller:
+  # -------------------------------------------------
+  # 1) Basic NGINX config overrides
+  # -------------------------------------------------
+  config:
+    client-max-body-size: 500m
+    proxy-read-timeout: 300
+    proxy-send-timeout: 300
+    proxy-body-size: 500m
+    log-format: '$remote_addr - $request $status [Pod=$upstream_http_x_pod_name]'
+    log-format-escape-json: true
+    # log-format-upstream: '$remote_addr - $request $status [Pod=$upstream_http_x_pod_name]'
+    log-format-upstream: >-
+      [$time_local] "$request" [upstream=$upstream_status] [client=$status]   \
+      [Pod=$upstream_http_x_pod_name] \
+      [Node=$upstream_http_x_node_name] \
+      $remote_addr - "$http_user_agent" 
+
+# -------------------------------------------------
+  # 2) Service configuration (LoadBalancer + annotations)
+  # -------------------------------------------------
+  service:
+    # Usually keep "enabled: true" if you want a Service
+    enabled: true
+    external:
+      enabled: true
+    annotations:
+      # Example: set load-balancing algorithm + timeouts
+      nginx.ingress.kubernetes.io/load-balance: "round_robin"
+      nginx.ingress.kubernetes.io/proxy-connect-timeout: "30s"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "30s"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "30s"
+      nginx.ingress.kubernetes.io/affinity: "none"
+
+    # The main HTTP/HTTPS ports
+    ports:
+      http: 80
+      https: 443
+      # If you want to reference the metrics port in the same service
+      metrics: 10254
+
+  # -------------------------------------------------
+  # 3) Metrics for Prometheus
+  # -------------------------------------------------
+  metrics:
+    enabled: true
+    port: 10254
+    service:
+      enabled: true
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "10254"
+      servicePort: 10254
+      type: ClusterIP
+
+rbac:
+  create: true
+
+# -------------------------------------------------
+# 4) Pod annotations (e.g., for Prometheus scraping)
+# -------------------------------------------------
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/port: "10254"

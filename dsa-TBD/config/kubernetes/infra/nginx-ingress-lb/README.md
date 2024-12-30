@@ -1,5 +1,7 @@
 ### Install Ingress
 
+- helm show values ingress-nginx/ingress-nginx | less
+
 - helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx --namespace ingress-nginx --create-namespace -f values.yml
 
 - helm uninstall ingress-nginx --namespace ingress-nginx 
@@ -25,3 +27,6 @@ ServiceMonitor
 - kubectl get endpoints -n monitoring
 
 - kubectl get endpoints -n ingress-nginx
+
+
+helm show values ingress-nginx/ingress-nginx | tee >(pbcopy) | less

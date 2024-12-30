@@ -6,7 +6,6 @@ export let options = {
     vus: 10,        // Number of concurrent users
     iterations: 250,  // Total number of requests to make
     duration: '60s',  // Time limit (e.g., '30s', '1m', '1h')
-    minDuration: '40s', // Minimum test duration
 };
 
 export default function () {
