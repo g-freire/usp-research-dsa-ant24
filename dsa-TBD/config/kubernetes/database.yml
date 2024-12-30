@@ -1,6 +1,5 @@
 # ===================================
 # DATABASE DEPLOYMENT AND SERVICE
-# Save as: config/kubernetes/database.yml
 # ===================================
 
 # Secrets for sensitive information (PostgreSQL credentials)

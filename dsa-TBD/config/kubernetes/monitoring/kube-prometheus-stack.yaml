@@ -435,3 +435,16 @@ releases:
           selector:
             matchLabels:
               app: cadvisor
+
+    # Add additionalServiceMonitors to monitor nginx-ingress
+    additionalServiceMonitors:
+      - name: nginx-ingress
+        selector:
+          matchLabels:
+            app.kubernetes.io/name: ingress-nginx
+        namespaceSelector:
+          matchNames:
+            - ingress-nginx  # adjust this to match your nginx-ingress namespace
+        endpoints:
+          - port: metrics   # this matches the metrics port name in your values.yml
+            interval: 30s

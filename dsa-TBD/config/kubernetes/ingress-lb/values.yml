@@ -1,0 +1,47 @@
+# -------------------------------------
+# Helm values for NGINX Ingress
+# -------------------------------------
+
+controller:
+  # NGINX configuration overrides
+  config:
+    client-max-body-size: 500m
+    proxy-read-timeout: 300
+    proxy-send-timeout: 300
+    proxy-body-size: 500m
+
+  # Ingress service definition
+  service:
+    annotations:
+      # Set round robin or other load-balancing algorithm
+      nginx.ingress.kubernetes.io/load-balance: "round_robin"
+      nginx.ingress.kubernetes.io/proxy-connect-timeout: "30s"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "30s"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "30s"
+      nginx.ingress.kubernetes.io/affinity: "none"
+    # Ports for HTTP, HTTPS, and metrics
+    ports:
+      http: 80
+      https: 443
+      metrics: 10254
+
+  # Metrics configuration for Prometheus
+  metrics:
+    enabled: true
+    port: 10254
+    service:
+      enabled: true
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "10254"
+      servicePort: 10254
+      type: ClusterIP
+
+# RBAC configuration
+rbac:
+  create: true
+
+# Pod annotations for Prometheus
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/port: "10254"
