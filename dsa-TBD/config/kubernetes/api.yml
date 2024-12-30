@@ -1,6 +1,5 @@
 # ===================================
 # API DEPLOYMENT AND SERVICE
-# Save as: config/kubernetes/api.yml
 # ===================================
 
 # Docker Registry Secret
