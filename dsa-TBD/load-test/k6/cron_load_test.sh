@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define the number of iterations (based on your testPipeline length)
-NUM_TESTS=4
+NUM_TESTS=5
 
 # Run each test configuration
 for i in $(seq 0 $((NUM_TESTS-1)))

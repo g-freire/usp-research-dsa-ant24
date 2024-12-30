@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 	"uty-api/internal/common/constant"
@@ -25,7 +26,7 @@ func NewHandler(r *gin.Engine, route string, val *validator.Validate, acRepo ACR
 	}
 	v1 := r.Group(route)
 	{
-		v1.GET("/", handler.GetAll)
+		v1.GET("", handler.GetAll)
 		v1.GET("/create_table", handler.CreateTable) // Route to create the table
 		v1.GET("/create", handler.SaveMany)          // eg. localhost:8080/iot/create?n=500
 	}
@@ -59,14 +60,26 @@ func (h *Handler) GetAll(c *gin.Context) {
 	limit := c.Query("limit")
 	offset := c.Query("offset")
 
+	podName := os.Getenv("POD_NAME")
+	nodeName := os.Getenv("NODE_NAME")
+	c.Header("X-Pod-Name", podName)
+	c.Header("X-Node-Name", nodeName)
+
 	result, err := h.ACRepository.GetAll(ctx, limit, offset)
 	if err != nil {
+		// Add each to the response headers
 		c.JSON(http.StatusNotFound, errors.Response{
-			Status:  http.StatusNotFound,
-			Type:    constant.ErrUnknownResource,
-			Message: []string{err.Error()}})
+			Status:   http.StatusNotFound,
+			Type:     constant.ErrUnknownResource,
+			PodName:  podName,
+			NodeName: nodeName,
+			Message:  []string{err.Error()}})
 	} else {
-		c.JSON(http.StatusOK, result)
+		c.JSON(http.StatusOK, gin.H{
+			"pod_name":  podName,
+			"node_name": nodeName,
+			"result":    result,
+		})
 	}
 }
 

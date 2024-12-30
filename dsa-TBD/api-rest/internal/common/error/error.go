@@ -7,9 +7,11 @@ import (
 )
 
 type Response struct {
-	Status  int
-	Type    string
-	Message []string
+	Status   int
+	Type     string
+	PodName  string
+	NodeName string
+	Message  []string
 }
 
 var (

@@ -1,3 +1,4 @@
+// k6 run load_test_pipeline.js
 import { sleep } from 'k6';
 import http from 'k6/http';
 import { check } from 'k6';
@@ -58,10 +59,10 @@ function getWaitTime(distribution, params) {
 
 // Test pipeline configurations for all distributions
 const testPipeline = [
-    { vus: 5, duration: '10s', distribution: DISTRIBUTIONS.POISSON, lambda: 1 },
-    { vus: 5, duration: '10s', distribution: DISTRIBUTIONS.UNIFORM, min: 0.5, max: 1.5 },
-    { vus: 5, duration: '10s', distribution: DISTRIBUTIONS.NORMAL, mean: 1, stddev: 0.2 },
-    { vus: 5, duration: '10s', distribution: DISTRIBUTIONS.EXPONENTIAL, lambda: 1 },
+    { vus: 250, duration: '10m', distribution: DISTRIBUTIONS.NORMAL, mean: 1, stddev: 0.2 },
+    { vus: 250, duration: '10m', distribution: DISTRIBUTIONS.UNIFORM, min: 0.5, max: 1.5 },
+
+
 ];
 
 // Select the test based on the environment variable ITERATION_INDEX
@@ -85,7 +86,8 @@ export default function () {
 
     sleep(wait);
 
-    const res = http.get('http://localhost:8080/iot');
+    // const res = http.get('http://localhost:8080/iot');
+    const res = http.get('http://iot-api.local/iot/');
     check(res, {
         'status is 200': (r) => r.status === 200,
     });
