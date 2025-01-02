@@ -16,7 +16,7 @@ helmfile -f prometheus-operator-crds.yaml apply
 ```
 or 
 ```bash
-helm install kube-prometheus-stack prometheus-community/kube-prometheus-stack \
+helm upgrade --install kube-prometheus-stack prometheus-community/kube-prometheus-stack \
   --namespace monitoring \
   --values prometheus-operator-crds.yaml
 ```
@@ -27,7 +27,7 @@ helmfile -f kube-prometheus-stack.yaml apply
 ```
 or
 ```bash
-helm install kube-prometheus-stack prometheus-community/kube-prometheus-stack \
+helm upgrade --install kube-prometheus-stack prometheus-community/kube-prometheus-stack \
   --namespace monitoring \
   --values kube-prometheus-stack.yaml
 ```

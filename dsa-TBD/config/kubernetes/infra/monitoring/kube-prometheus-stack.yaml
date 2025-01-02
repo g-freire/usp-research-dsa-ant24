@@ -204,7 +204,7 @@ releases:
         type: ClusterIP
 
       ingress:
-        enabled: false
+        enabled: true
 
       # https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/api.md#prometheusspec
       prometheusSpec:
