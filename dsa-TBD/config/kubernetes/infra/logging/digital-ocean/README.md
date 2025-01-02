@@ -1,0 +1,1 @@
+k apply -f digital-ocean/ -n logging

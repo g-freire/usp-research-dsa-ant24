@@ -51,3 +51,12 @@ MIT License
 
 ## Acknowledgments
 This research and development effort were made possible by the contributions of Gustavo Freire, Herminio Paucar e Julio Cezar Estrella and the support of the Laboratory of Distributed Systems and Concurrent Programming (LaSDPC) at São Paulo University.
+
+
+
+- trocar load balancers (DONE)
+- executar teste e parser (DONE)
+- script python pra alterar o nginx
+- agentic model
+- interface streamlit for agentic model
+- kibana ?

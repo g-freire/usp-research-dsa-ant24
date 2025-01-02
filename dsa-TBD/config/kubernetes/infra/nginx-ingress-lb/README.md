@@ -21,7 +21,6 @@ ServiceMonitor
 
 - kubectl apply -f ingress-nginx-servicemonitor.yaml
 
-
 - kubectl get servicemonitor -n monitoring
 
 - kubectl get endpoints -n monitoring
@@ -30,3 +29,7 @@ ServiceMonitor
 
 
 helm show values ingress-nginx/ingress-nginx | tee >(pbcopy) | less
+
+
+
+curl -G 'http://localhost:58685/api/v1/query' --data-urlencode 'query=nginx_ingress_controller_requests[5m]'
