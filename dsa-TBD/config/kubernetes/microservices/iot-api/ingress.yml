@@ -1,19 +1,21 @@
 # IoT Application Ingress
+# https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/#load-balance 
+# https://github.com/kubernetes/ingress-nginx/tree/main/rootfs/etc/nginx/lua/balancer
+
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: iot-app-ingress
   namespace: usp-dev
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /  # Ensures paths are forwarded correctly
+    nginx.ingress.kubernetes.io/rewrite-target: /
     
     # Load balancing
-    # nginx.ingress.kubernetes.io/load-balance: "round_robin"  
-    # nginx.ingress.kubernetes.io/load-balance: "least_conn"
-    nginx.ingress.kubernetes.io/load-balance: "random"
+    # Available options: chash, chashsubset, ewma, resty, round_robin, sticky, sticky_balanced, sticky_persistent
+    nginx.ingress.kubernetes.io/load-balance: "round_robin"
     
 spec:
-  ingressClassName: nginx  # Specify the NGINX Ingress Class
+  ingressClassName: nginx
   rules:
     - host: iot-api.local
       http:

@@ -1,5 +1,6 @@
 # -------------------------------------
 # Helm values for NGINX Ingress
+# helm show values ingress-nginx/ingress-nginx
 # https://github.com/kubernetes/ingress-nginx/blob/main/charts/ingress-nginx/values.yaml
 # -------------------------------------
 
@@ -12,6 +13,7 @@ controller:
   # 1) Basic NGINX config overrides
   # -------------------------------------------------
   config:
+    load-balance: "round_robin"
     client-max-body-size: 500m
     proxy-read-timeout: 300
     proxy-send-timeout: 300
