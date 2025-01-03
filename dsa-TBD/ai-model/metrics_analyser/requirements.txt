@@ -1,4 +1,4 @@
 langgraph
-pygraphviz
+dotenv
 langchain_openai
 streamlit

@@ -26,4 +26,4 @@ def main():
         render_analysis_tab(OPENAI_API_KEY)
 
 if __name__ == "__main__":
-    main()
+    main() 

@@ -47,14 +47,16 @@ def render_analysis_tab(openai_api_key):
                         output = llm.invoke(messages)
                         st.success("Analysis complete.")
                         
-                        col1, col2 = st.columns(2)
+                        # Create a full-width container for the analysis
+                        st.subheader("Analysis Results")
+                        st.markdown("---")  # Add a visual separator
+                        st.write(output.content)
                         
-                        with col1:
-                            st.subheader("Analysis Results")
-                            st.write(output.content)
+                        # Add some spacing
+                        st.markdown("<br>", unsafe_allow_html=True)
                         
-                        with col2:
-                            st.subheader("Metrics Summary")
+                        # Place metrics summary at the bottom in an expander
+                        with st.expander("🔍 View Detailed Metrics Summary"):
                             st.json(existing_summary)
 
                     except Exception as e:
