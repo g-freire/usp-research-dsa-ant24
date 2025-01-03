@@ -1,0 +1,198 @@
+{
+  "5m": {
+    "request_count": {
+      "summary": "request_count data aggregated over 5m",
+      "example_values": [
+        {
+          "timestamp": 1735834969,
+          "value": "238.41743883741083"
+        },
+        {
+          "timestamp": 1735835029,
+          "value": "245.93279103880516"
+        }
+      ]
+    },
+    "response_time_avg": {
+      "summary": "response_time_avg data aggregated over 5m",
+      "example_values": [
+        {
+          "timestamp": 1735834969,
+          "value": "2.2638657422830843"
+        },
+        {
+          "timestamp": 1735835029,
+          "value": "0.7927557007558408"
+        }
+      ]
+    },
+    "response_time_p95": {
+      "summary": "response_time_p95 data aggregated over 5m",
+      "example_values": [
+        {
+          "timestamp": 1735834969,
+          "value": "0.08371811224489789"
+        },
+        {
+          "timestamp": 1735835029,
+          "value": "0.02220524296675189"
+        }
+      ]
+    },
+    "active_connections": {
+      "summary": "active_connections data aggregated over 5m",
+      "example_values": []
+    },
+    "dropped_connections": {
+      "summary": "dropped_connections data aggregated over 5m",
+      "example_values": []
+    }
+  },
+  "15m": {
+    "request_count": {
+      "summary": "request_count data aggregated over 15m",
+      "example_values": [
+        {
+          "timestamp": 1735834370,
+          "value": "0"
+        },
+        {
+          "timestamp": 1735834430,
+          "value": "0"
+        }
+      ]
+    },
+    "response_time_avg": {
+      "summary": "response_time_avg data aggregated over 15m",
+      "example_values": [
+        {
+          "timestamp": 1735834370,
+          "value": "0"
+        },
+        {
+          "timestamp": 1735834430,
+          "value": "0"
+        }
+      ]
+    },
+    "response_time_p95": {
+      "summary": "response_time_p95 data aggregated over 15m",
+      "example_values": [
+        {
+          "timestamp": 1735834370,
+          "value": "NaN"
+        },
+        {
+          "timestamp": 1735834430,
+          "value": "NaN"
+        }
+      ]
+    },
+    "active_connections": {
+      "summary": "active_connections data aggregated over 15m",
+      "example_values": []
+    },
+    "dropped_connections": {
+      "summary": "dropped_connections data aggregated over 15m",
+      "example_values": []
+    }
+  },
+  "30m": {
+    "request_count": {
+      "summary": "request_count data aggregated over 30m",
+      "example_values": [
+        {
+          "timestamp": 1735833470,
+          "value": "0"
+        },
+        {
+          "timestamp": 1735833530,
+          "value": "0"
+        }
+      ]
+    },
+    "response_time_avg": {
+      "summary": "response_time_avg data aggregated over 30m",
+      "example_values": [
+        {
+          "timestamp": 1735833470,
+          "value": "0"
+        },
+        {
+          "timestamp": 1735833530,
+          "value": "0"
+        }
+      ]
+    },
+    "response_time_p95": {
+      "summary": "response_time_p95 data aggregated over 30m",
+      "example_values": [
+        {
+          "timestamp": 1735833470,
+          "value": "NaN"
+        },
+        {
+          "timestamp": 1735833530,
+          "value": "NaN"
+        }
+      ]
+    },
+    "active_connections": {
+      "summary": "active_connections data aggregated over 30m",
+      "example_values": []
+    },
+    "dropped_connections": {
+      "summary": "dropped_connections data aggregated over 30m",
+      "example_values": []
+    }
+  },
+  "1h": {
+    "request_count": {
+      "summary": "request_count data aggregated over 1h",
+      "example_values": [
+        {
+          "timestamp": 1735832690,
+          "value": "0"
+        },
+        {
+          "timestamp": 1735832750,
+          "value": "0"
+        }
+      ]
+    },
+    "response_time_avg": {
+      "summary": "response_time_avg data aggregated over 1h",
+      "example_values": [
+        {
+          "timestamp": 1735832690,
+          "value": "0"
+        },
+        {
+          "timestamp": 1735832750,
+          "value": "0"
+        }
+      ]
+    },
+    "response_time_p95": {
+      "summary": "response_time_p95 data aggregated over 1h",
+      "example_values": [
+        {
+          "timestamp": 1735832690,
+          "value": "NaN"
+        },
+        {
+          "timestamp": 1735832750,
+          "value": "NaN"
+        }
+      ]
+    },
+    "active_connections": {
+      "summary": "active_connections data aggregated over 1h",
+      "example_values": []
+    },
+    "dropped_connections": {
+      "summary": "dropped_connections data aggregated over 1h",
+      "example_values": []
+    }
+  }
+}
