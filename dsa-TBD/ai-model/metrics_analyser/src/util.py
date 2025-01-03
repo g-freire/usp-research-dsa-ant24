@@ -20,6 +20,7 @@ def parse_ingress_details(raw_output):
         "Namespace": None,
         "Host": None,
         "Load Balancer Type": None,
+        "Ingress Class": None,
     }
 
     for line in raw_output.splitlines():
@@ -32,5 +33,7 @@ def parse_ingress_details(raw_output):
             details["Host"] = line.split(" ")[0].strip()
         elif "nginx.ingress.kubernetes.io/load-balance" in line:
             details["Load Balancer Type"] = line.split(":", 1)[1].strip()
+        elif "IngressClass:" in line:
+            details["Ingress Class"] = line.split(":", 1)[1].strip()
     
     return details
