@@ -20,6 +20,7 @@ def parse_ingress_details(raw_output):
         "Namespace": None,
         "Host": None,
         "Load Balancer Type": None,
+        "Ingress Class": None,
     }
 
     for line in raw_output.splitlines():
@@ -32,5 +33,26 @@ def parse_ingress_details(raw_output):
             details["Host"] = line.split(" ")[0].strip()
         elif "nginx.ingress.kubernetes.io/load-balance" in line:
             details["Load Balancer Type"] = line.split(":", 1)[1].strip()
+        elif "Ingress Class:" in line:  # Changed from IngressClass: to match actual output
+            details["Ingress Class"] = line.split(":", 1)[1].strip()
     
     return details
+
+
+def update_ingress_load_balancer(ingress_name, namespace, load_balancer_type):
+    """
+    Updates the load balancer type annotation for a Kubernetes ingress
+    Valid load_balancer_type values: 'round_robin', 'least_conn', 'ip_hash'
+    """
+    try:
+        annotation = f"nginx.ingress.kubernetes.io/load-balance={load_balancer_type}"
+        result = subprocess.run(
+            ["kubectl", "annotate", "ingress", ingress_name, 
+             f"{annotation}", "--overwrite", "-n", namespace],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        return True, result.stdout
+    except subprocess.CalledProcessError as e:
+        return False, f"Error updating ingress load balancer: {e.stderr.strip()}"

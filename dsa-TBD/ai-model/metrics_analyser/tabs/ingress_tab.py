@@ -1,5 +1,5 @@
 import streamlit as st
-from src.util import get_ingress_details, parse_ingress_details
+from src.kubernetes_utils import get_ingress_details, parse_ingress_details, update_ingress_load_balancer
 
 def render_ingress_tab():
     st.write("View and manage Ingress configuration details")
@@ -52,6 +52,36 @@ def render_ingress_tab():
                     st.write(f"**{label}:**")
                 with col2:
                     st.write(value or "N/A")
+
+        # After displaying current metrics, add load balancer modification section
+        st.write("")
+        st.divider()
+        st.subheader("Modify Load Balancer Configuration")
+        
+        # Load balancer type options
+        lb_types = [
+            "chash",
+            "chashsubset",
+            "ewma",
+            "resty",
+            "round_robin",
+            "sticky",
+            "sticky_balanced",
+            "sticky_persistent"
+        ]
+        
+        new_lb_type = st.selectbox(
+            "Select new load balancer type",
+            lb_types,
+            help="Choose the load balancing algorithm to be applied"
+        )
+        
+        if st.button("Update Load Balancer"):
+            success, message = update_ingress_load_balancer(ingress_name, namespace, new_lb_type)
+            if success:
+                st.success("Load balancer type updated successfully")
+            else:
+                st.error(message)
 
         if st.button("Refresh Ingress Details"):
             st.rerun()
